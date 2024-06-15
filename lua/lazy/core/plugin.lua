@@ -594,7 +594,7 @@ function M.load()
         return local_spec ~= nil
       end,
     },
-    { "folke/lazy.nvim" },
+    { "956MB/lazy.nvim" },
   })
 
   -- override some lazy props

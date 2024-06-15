@@ -127,8 +127,8 @@ function M.bootstrap()
       "git",
       "clone",
       "--filter=blob:none",
-      "https://github.com/folke/lazy.nvim.git",
-      "--branch=stable", -- latest stable release
+      "https://github.com/956MB/lazy.nvim.git",
+      "--branch=summary-urls", -- latest stable release
       lazypath,
     })
   end

@@ -68,7 +68,7 @@ You can add the following Lua code to your `init.lua` to bootstrap
         "git",
         "clone",
         "--filter=blob:none",
-        "https://github.com/folke/lazy.nvim.git",
+        "https://github.com/956MB/lazy.nvim.git",
         "--branch=stable", -- latest stable release
         lazypath,
       })
