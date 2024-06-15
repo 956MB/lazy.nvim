@@ -81,7 +81,7 @@ require("lazy").setup({
 ## 🔌 Plugin Spec
 
 | Property         | Type                                                                                                                                | Description                                                                                                                                                                                                                                                                                                                                                                                                            |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **[1]**          | `string?`                                                                                                                           | Short plugin url. Will be expanded using `config.git.url_format`                                                                                                                                                                                                                                                                                                                                                       |
 | **dir**          | `string?`                                                                                                                           | A directory pointing to a local plugin                                                                                                                                                                                                                                                                                                                                                                                 |
 | **url**          | `string?`                                                                                                                           | A custom git url where the plugin is hosted                                                                                                                                                                                                                                                                                                                                                                            |
@@ -93,9 +93,9 @@ require("lazy").setup({
 | **dependencies** | `LazySpec[]`                                                                                                                        | A list of plugin names or plugin specs that should be loaded when the plugin loads. Dependencies are always lazy-loaded unless specified otherwise. When specifying a name, make sure the plugin spec has been defined somewhere else.                                                                                                                                                                                 |
 | **init**         | `fun(LazyPlugin)`                                                                                                                   | `init` functions are always executed during startup                                                                                                                                                                                                                                                                                                                                                                    |
 | **opts**         | `table` or `fun(LazyPlugin, opts:table)`                                                                                            | `opts` should be a table (will be merged with parent specs), return a table (replaces parent specs) or should change a table. The table will be passed to the `Plugin.config()` function. Setting this value will imply `Plugin.config()`                                                                                                                                                                              |
-| **config**       | `fun(LazyPlugin, opts:table)` or `true`                                                                                             | `config` is executed when the plugin loads. The default implementation will automatically run `require(MAIN).setup(opts)` if `opts` or `config = true` is set. Lazy uses several heuristics to determine the plugin's `MAIN` module automatically based on the plugin's **name**. See also `opts`. To use the default implementation without `opts` set `config` to `true`.                                                                                |
+| **config**       | `fun(LazyPlugin, opts:table)` or `true`                                                                                             | `config` is executed when the plugin loads. The default implementation will automatically run `require(MAIN).setup(opts)` if `opts` or `config = true` is set. Lazy uses several heuristics to determine the plugin's `MAIN` module automatically based on the plugin's **name**. See also `opts`. To use the default implementation without `opts` set `config` to `true`.                                            |
 | **main**         | `string?`                                                                                                                           | You can specify the `main` module to use for `config()` and `opts()`, in case it can not be determined automatically. See `config()`                                                                                                                                                                                                                                                                                   |
-| **build**        | `fun(LazyPlugin)` or `string` or a list of build commands                                                                           | `build` is executed when a plugin is installed or updated. Before running `build`, a plugin is first loaded. If it's a string it will be ran as a shell command. When prefixed with `:` it is a Neovim command. You can also specify a list to executed multiple build commands. Some plugins provide their own `build.lua` which is automatically used by lazy. So no need to specify a build step for those plugins. |
+| **build**        | `fun(LazyPlugin)` or `string` or a list of build commands                                                                           | `build` is executed when a plugin is installed or updated. Before running `build`, a plugin is first loaded. If it's a string it will be run as a shell command. When prefixed with `:` it is a Neovim command. You can also specify a list to executed multiple build commands. Some plugins provide their own `build.lua` which is automatically used by lazy. So no need to specify a build step for those plugins. |
 | **branch**       | `string?`                                                                                                                           | Branch of the repository                                                                                                                                                                                                                                                                                                                                                                                               |
 | **tag**          | `string?`                                                                                                                           | Tag of the repository                                                                                                                                                                                                                                                                                                                                                                                                  |
 | **commit**       | `string?`                                                                                                                           | Commit of the repository                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -279,8 +279,8 @@ return {
   -- you can use a custom url to fetch a plugin
   { url = "git@github.com:folke/noice.nvim.git" },
 
-  -- local plugins can also be configure with the dev option.
-  -- This will use {config.dev.path}/noice.nvim/ instead of fetching it from Github
+  -- local plugins can also be configured with the dev option.
+  -- This will use {config.dev.path}/noice.nvim/ instead of fetching it from GitHub
   -- With the dev option, you can easily switch between the local and installed version of a plugin
   { "folke/noice.nvim", dev = true },
 }
@@ -307,6 +307,7 @@ return {
   },
   -- leave nil when passing the spec as the first argument to setup()
   spec = nil, ---@type LazySpec
+  local_spec = true, -- load project specific .lazy.lua spec files. They will be added at the end of the spec.
   lockfile = vim.fn.stdpath("config") .. "/lazy-lock.json", -- lockfile generated after running update.
   ---@type number? limit the maximum amount of concurrent tasks
   concurrency = jit.os:find("Windows") and (vim.uv.available_parallelism() * 2) or nil,
@@ -530,7 +531,6 @@ Any operation can be started from the UI, with a sub command or an API function:
 | `:Lazy debug` | `require("lazy").debug()` | Show debug information |
 | `:Lazy health` | `require("lazy").health()` | Run `:checkhealth lazy` |
 | `:Lazy help` | `require("lazy").help()` | Toggle this help page |
-| `:Lazy locations` | `require("lazy").locations()` | Toggle plugin URLs in plugin list |
 | `:Lazy home` | `require("lazy").home()` | Go back to plugin list |
 | `:Lazy install [plugins]` | `require("lazy").install(opts?)` | Install missing plugins |
 | `:Lazy load {plugins}` | `require("lazy").load(opts)` | Load a plugin that has not been loaded yet. Similar to `:packadd`. Like `:Lazy load foo.nvim`. Use `:Lazy! load` to skip `cond` checks. |
@@ -538,8 +538,8 @@ Any operation can be started from the UI, with a sub command or an API function:
 | `:Lazy profile` | `require("lazy").profile()` | Show detailed profiling |
 | `:Lazy reload {plugins}` | `require("lazy").reload(opts)` | Reload a plugin (experimental!!) |
 | `:Lazy restore [plugins]` | `require("lazy").restore(opts?)` | Updates all plugins to the state in the lockfile. For a single plugin: restore it to the state in the lockfile or to a given commit under the cursor |
-| `:Lazy sync [plugins]` | `require("lazy").sync(opts?)` | Run install, clean and update |
-| `:Lazy update [plugins]` | `require("lazy").update(opts?)` | Update plugins. This will also update the lockfile |
+| `:Lazy sync [plugins]`    | `require("lazy").sync(opts?)`    | Run install, clean and update                                                                                                                        |
+| `:Lazy update [plugins]`  | `require("lazy").update(opts?)`  | Update plugins. This will also update the lockfile                                                                                                   |
 
 <!-- commands:end -->
 
@@ -565,7 +565,7 @@ Stats API (`require("lazy").stats()`):
 {
   -- startuptime in milliseconds till UIEnter
   startuptime = 0,
-  -- when true, startuptime is the accurate cputime for the Neovim process. (Linux & Macos)
+  -- when true, startuptime is the accurate cputime for the Neovim process. (Linux & macOS)
   -- this is more accurate than `nvim --startuptime`, and as such will be slightly higher
   -- when false, startuptime is calculated based on a delta with a timestamp when lazy started.
   real_cputime = false,
@@ -790,40 +790,40 @@ To uninstall **lazy.nvim**, you need to remove the following files and directori
 
 <!-- colors:start -->
 
-| Highlight Group | Default Group | Description |
-| --- | --- | --- |
-| **LazyButton** | ***CursorLine*** |  |
-| **LazyButtonActive** | ***Visual*** |  |
-| **LazyComment** | ***Comment*** |  |
-| **LazyCommit** | ***@variable.builtin*** | commit ref |
-| **LazyCommitIssue** | ***Number*** |  |
-| **LazyCommitScope** | ***Italic*** | conventional commit scope |
-| **LazyCommitType** | ***Title*** | conventional commit type |
-| **LazyDimmed** | ***Conceal*** | property |
-| **LazyDir** | ***@markup.link*** | directory |
-| **LazyH1** | ***IncSearch*** | home button |
-| **LazyH2** | ***Bold*** | titles |
-| **LazyLocal** | ***Constant*** |  |
-| **LazyNoCond** | ***DiagnosticWarn*** | unloaded icon for a plugin where `cond()` was false |
-| **LazyNormal** | ***NormalFloat*** |  |
-| **LazyProgressDone** | ***Constant*** | progress bar done |
-| **LazyProgressTodo** | ***LineNr*** | progress bar todo |
-| **LazyProp** | ***Conceal*** | property |
-| **LazyReasonCmd** | ***Operator*** |  |
-| **LazyReasonEvent** | ***Constant*** |  |
-| **LazyReasonFt** | ***Character*** |  |
-| **LazyReasonImport** | ***Identifier*** |  |
-| **LazyReasonKeys** | ***Statement*** |  |
-| **LazyReasonPlugin** | ***Special*** |  |
-| **LazyReasonRequire** | ***@variable.parameter*** |  |
-| **LazyReasonRuntime** | ***@macro*** |  |
-| **LazyReasonSource** | ***Character*** |  |
-| **LazyReasonStart** | ***@variable.member*** |  |
-| **LazySpecial** | ***@punctuation.special*** |  |
-| **LazyTaskError** | ***ErrorMsg*** | task errors |
-| **LazyTaskOutput** | ***MsgArea*** | task output |
-| **LazyUrl** | ***@markup.link*** | url |
-| **LazyValue** | ***@string*** | value of a property |
+| Highlight Group       | Default Group              | Description                                         |
+| --------------------- | -------------------------- | --------------------------------------------------- |
+| **LazyButton**        | **_CursorLine_**           |                                                     |
+| **LazyButtonActive**  | **_Visual_**               |                                                     |
+| **LazyComment**       | **_Comment_**              |                                                     |
+| **LazyCommit**        | **_@variable.builtin_**    | commit ref                                          |
+| **LazyCommitIssue**   | **_Number_**               |                                                     |
+| **LazyCommitScope**   | **_Italic_**               | conventional commit scope                           |
+| **LazyCommitType**    | **_Title_**                | conventional commit type                            |
+| **LazyDimmed**        | **_Conceal_**              | property                                            |
+| **LazyDir**           | **_@markup.link_**         | directory                                           |
+| **LazyH1**            | **_IncSearch_**            | home button                                         |
+| **LazyH2**            | **_Bold_**                 | titles                                              |
+| **LazyLocal**         | **_Constant_**             |                                                     |
+| **LazyNoCond**        | **_DiagnosticWarn_**       | unloaded icon for a plugin where `cond()` was false |
+| **LazyNormal**        | **_NormalFloat_**          |                                                     |
+| **LazyProgressDone**  | **_Constant_**             | progress bar done                                   |
+| **LazyProgressTodo**  | **_LineNr_**               | progress bar todo                                   |
+| **LazyProp**          | **_Conceal_**              | property                                            |
+| **LazyReasonCmd**     | **_Operator_**             |                                                     |
+| **LazyReasonEvent**   | **_Constant_**             |                                                     |
+| **LazyReasonFt**      | **_Character_**            |                                                     |
+| **LazyReasonImport**  | **_Identifier_**           |                                                     |
+| **LazyReasonKeys**    | **_Statement_**            |                                                     |
+| **LazyReasonPlugin**  | **_Special_**              |                                                     |
+| **LazyReasonRequire** | **_@variable.parameter_**  |                                                     |
+| **LazyReasonRuntime** | **_@macro_**               |                                                     |
+| **LazyReasonSource**  | **_Character_**            |                                                     |
+| **LazyReasonStart**   | **_@variable.member_**     |                                                     |
+| **LazySpecial**       | **_@punctuation.special_** |                                                     |
+| **LazyTaskError**     | **_ErrorMsg_**             | task errors                                         |
+| **LazyTaskOutput**    | **_MsgArea_**              | task output                                         |
+| **LazyUrl**           | **_@markup.link_**         | url                                                 |
+| **LazyValue**         | **_@string_**              | value of a property                                 |
 
 <!-- colors:end -->
 

@@ -1,5 +1,4 @@
 local Config = require("lazy.core.config")
-local Handler = require("lazy.core.handler")
 local Util = require("lazy.core.util")
 
 ---@class LazyCorePlugin
@@ -20,6 +19,7 @@ local Spec = {}
 M.Spec = Spec
 M.last_fid = 0
 M.fid_stack = {} ---@type number[]
+M.LOCAL_SPEC = ".lazy.lua"
 
 ---@param spec? LazySpec
 ---@param opts? {optional?:boolean}
@@ -117,7 +117,7 @@ function Spec:add(plugin, results)
       dir = dir_dev
     end
   elseif plugin.dev == false then
-    -- explicitely select the default path
+    -- explicitly select the default path
     dir = Config.options.root .. "/" .. plugin.name
   end
 
@@ -319,6 +319,9 @@ function Spec:fix_disabled()
     end
   end
 
+  -- check optional plugins again
+  self:fix_optional()
+
   -- rebuild any plugin specs that were modified
   self:rebuild()
 end
@@ -399,20 +402,34 @@ function Spec:import(spec)
 
   ---@type string[]
   local modnames = {}
-  Util.lsmod(spec.import, function(modname)
-    modnames[#modnames + 1] = modname
-  end)
-  table.sort(modnames)
+
+  if spec.import:find(M.LOCAL_SPEC, 1, true) then
+    modnames = { spec.import }
+  else
+    Util.lsmod(spec.import, function(modname)
+      modnames[#modnames + 1] = modname
+    end)
+    table.sort(modnames)
+  end
 
   for _, modname in ipairs(modnames) do
     imported = imported + 1
-    Util.track({ import = modname })
+    local name = modname
+    if modname:find(M.LOCAL_SPEC, 1, true) then
+      name = vim.fn.fnamemodify(modname, ":~:.")
+    end
+    Util.track({ import = name })
     self.importing = modname
     -- unload the module so we get a clean slate
     ---@diagnostic disable-next-line: no-unknown
     package.loaded[modname] = nil
     Util.try(function()
-      local mod = require(modname)
+      local mod = nil
+      if modname:find(M.LOCAL_SPEC, 1, true) then
+        mod = M.local_spec(modname)
+      else
+        mod = require(modname)
+      end
       if type(mod) ~= "table" then
         self.importing = nil
         return self:error(
@@ -533,12 +550,52 @@ function M.update_state()
   end
 end
 
+---@param path string
+function M.local_spec(path)
+  local file = vim.secure.read(path)
+  if file then
+    return loadstring(file)()
+  end
+  return {}
+end
+
+---@return string?
+function M.find_local_spec()
+  if not Config.options.local_spec then
+    return
+  end
+  local path = vim.uv.cwd()
+  while path ~= "" do
+    local file = path .. "/" .. M.LOCAL_SPEC
+    if vim.fn.filereadable(file) == 1 then
+      return file
+    end
+    local p = vim.fn.fnamemodify(path, ":h")
+    if p == path then
+      break
+    end
+    path = p
+  end
+end
+
 function M.load()
   M.loading = true
   -- load specs
   Util.track("spec")
   Config.spec = Spec.new()
-  Config.spec:parse({ vim.deepcopy(Config.options.spec), { "folke/lazy.nvim" } })
+
+  local local_spec = M.find_local_spec()
+
+  Config.spec:parse({
+    vim.deepcopy(Config.options.spec),
+    {
+      import = local_spec or M.LOCAL_SPEC,
+      cond = function()
+        return local_spec ~= nil
+      end,
+    },
+    { "folke/lazy.nvim" },
+  })
 
   -- override some lazy props
   local lazy = Config.spec.plugins["lazy.nvim"]
@@ -639,7 +696,27 @@ function M._values(root, plugin, prop, is_list)
   end
 
   values = type(values) == "table" and values or { values }
-  return is_list and Util.extend(ret, values) or Util.merge(ret, values)
+  if is_list then
+    return Util.extend(ret, values)
+  else
+    ---@type {path:string[], list:any[]}[]
+    local lists = {}
+    for _, key in ipairs(plugin[prop .. "_extend"] or {}) do
+      local path = vim.split(key, ".", { plain = true })
+      local r = Util.key_get(ret, path)
+      local v = Util.key_get(values, path)
+      if type(r) == "table" and type(v) == "table" then
+        lists[key] = { path = path, list = {} }
+        vim.list_extend(lists[key].list, r)
+        vim.list_extend(lists[key].list, v)
+      end
+    end
+    local t = Util.merge(ret, values)
+    for _, list in pairs(lists) do
+      Util.key_set(t, list.path, list.list)
+    end
+    return t
+  end
 end
 
 return M

@@ -1,5 +1,86 @@
 # Changelog
 
+## [10.24.0](https://github.com/folke/lazy.nvim/compare/v10.23.0...v10.24.0) (2024-06-15)
+
+
+### Features
+
+* find local_spec in parent directories as well. Closes [#1519](https://github.com/folke/lazy.nvim/issues/1519) ([e2e10d9](https://github.com/folke/lazy.nvim/commit/e2e10d9cbe133265ccdcc44cafa7c10773d96837))
+
+
+### Bug Fixes
+
+* **plugin:** check optional plugins again after resolving enabled. Fixes [#1402](https://github.com/folke/lazy.nvim/issues/1402) ([067fd41](https://github.com/folke/lazy.nvim/commit/067fd41933c9f59eb3445eb942052c651a4c9a62))
+
+## [10.23.0](https://github.com/folke/lazy.nvim/compare/v10.22.2...v10.23.0) (2024-06-07)
+
+
+### Features
+
+* **plugin:** `opts_extend` can be a list of dotted keys that will be extended instead of merged ([1f7b720](https://github.com/folke/lazy.nvim/commit/1f7b720cffa6d8f00ebb040bc60e8e056e0a6002))
+* **util:** opts merging now supports lists extending by tagging a table with __extend = true. Use with care ([74fd361](https://github.com/folke/lazy.nvim/commit/74fd3611f291a2506c5534109689bb7b028f0566))
+
+## [10.22.2](https://github.com/folke/lazy.nvim/compare/v10.22.1...v10.22.2) (2024-06-06)
+
+
+### Bug Fixes
+
+* **keys:** buffer-local nop mappings ([ff90417](https://github.com/folke/lazy.nvim/commit/ff904178089582f90fdc625493f3d3bddbefd6ea))
+* **keys:** never lazy-load `&lt;nop&gt;` or empty rhs keymaps ([3e4c795](https://github.com/folke/lazy.nvim/commit/3e4c795cec32481bc6d0b30c05125fdf7ef2d412))
+
+## [10.22.1](https://github.com/folke/lazy.nvim/compare/v10.22.0...v10.22.1) (2024-06-02)
+
+
+### Bug Fixes
+
+* force new release ([9242edb](https://github.com/folke/lazy.nvim/commit/9242edb73939e7508dbd827e9c013579391f0668))
+
+## [10.22.0](https://github.com/folke/lazy.nvim/compare/v10.21.2...v10.22.0) (2024-06-01)
+
+
+### Features
+
+* set `vim.env.LAZY` to lazy root ([6a141a6](https://github.com/folke/lazy.nvim/commit/6a141a6dbb6f6b5495ef6716c0dce898546d7b2c))
+
+## [10.21.2](https://github.com/folke/lazy.nvim/compare/v10.21.1...v10.21.2) (2024-05-31)
+
+
+### Bug Fixes
+
+* **ui:** deduplicate plugins when selecting multiple ([#1491](https://github.com/folke/lazy.nvim/issues/1491)) ([b77aaa0](https://github.com/folke/lazy.nvim/commit/b77aaa08cb5b178ed8662765caa41c70ff254a4c))
+
+## [10.21.1](https://github.com/folke/lazy.nvim/compare/v10.21.0...v10.21.1) (2024-05-31)
+
+
+### Bug Fixes
+
+* **view:** backward compat for older Neovim versions. Fixes [#1489](https://github.com/folke/lazy.nvim/issues/1489) ([917dfbe](https://github.com/folke/lazy.nvim/commit/917dfbe2a9b606443639d1e809f2e4561a6dd654))
+
+## [10.21.0](https://github.com/folke/lazy.nvim/compare/v10.20.5...v10.21.0) (2024-05-26)
+
+
+### Features
+
+* added support for local spec files `.lazy.lua` ([9dde1f1](https://github.com/folke/lazy.nvim/commit/9dde1f1bce44a8fd8cb885b5a8e8d47d8fd7b8c1))
+* single-plugin keys in the lazy view in visual mode ([#1476](https://github.com/folke/lazy.nvim/issues/1476)) ([7667a73](https://github.com/folke/lazy.nvim/commit/7667a73dee381c5fb7d538f6152aeb591e3f0372))
+
+
+### Bug Fixes
+
+* **render:** disable underline for diagnostics ([#1478](https://github.com/folke/lazy.nvim/issues/1478)) ([ea7b9c3](https://github.com/folke/lazy.nvim/commit/ea7b9c3c3fd9026e1a5ae27950585df9a42ccd5b))
+
+## [10.20.5](https://github.com/folke/lazy.nvim/compare/v10.20.4...v10.20.5) (2024-05-21)
+
+
+### Bug Fixes
+
+* **checker:** ignore dev plugins ([#1384](https://github.com/folke/lazy.nvim/issues/1384)) ([2e04a0c](https://github.com/folke/lazy.nvim/commit/2e04a0c02c17facd3772c382099215acbe72535b))
+* **git:** force `autocrlf=false`. Fixes [#1055](https://github.com/folke/lazy.nvim/issues/1055) ([d2a4ce2](https://github.com/folke/lazy.nvim/commit/d2a4ce22dc02aa08c176cd7692b5b0ed74e4722b))
+* **help:** get rid of any tbl_flatten or iter flatten code ([56a34a8](https://github.com/folke/lazy.nvim/commit/56a34a825b55e0e30cd9df0e055e428a13afd4aa))
+* **keys:** properly deal with ft list for keys. Fixes [#1448](https://github.com/folke/lazy.nvim/issues/1448) ([82cf974](https://github.com/folke/lazy.nvim/commit/82cf974e0939b3440c4470cbcd8e7869abfe480b))
+* **keys:** properly re-create buffer-local mappings. Fixes [#1448](https://github.com/folke/lazy.nvim/issues/1448) ([39de11a](https://github.com/folke/lazy.nvim/commit/39de11a2fa7f4b91556631c49a673bf3e48bcc16))
+* use vim.iter():flatten():totable() over vim.tbl_flatten ([#1454](https://github.com/folke/lazy.nvim/issues/1454)) ([d039aec](https://github.com/folke/lazy.nvim/commit/d039aecddb414c2df9d295e9182ed217196a2c1c))
+
 ## [10.20.4](https://github.com/folke/lazy.nvim/compare/v10.20.3...v10.20.4) (2024-05-12)
 
 
