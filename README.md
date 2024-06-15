@@ -1,5 +1,11 @@
 # 💤 lazy.nvim
 
+## Changes in this fork (summary-urls)
+
+- Adds a URL to the end of each plugin entry line in the **lazy.nvim** Home/Summary page, making displaying the entire page or finding a plugin's URL easier. (Can be toggled with the `T` key.)
+
+![image](https://private-user-images.githubusercontent.com/39519792/326110615-08572042-1df9-41a5-a997-5e6e6bab0f1f.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MTg0ODc5NTQsIm5iZiI6MTcxODQ4NzY1NCwicGF0aCI6Ii8zOTUxOTc5Mi8zMjYxMTA2MTUtMDg1NzIwNDItMWRmOS00MWE1LWE5OTctNWU2ZTZiYWIwZjFmLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDA2MTUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwNjE1VDIxNDA1NFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTI2OWIwZWRmN2UwZTNhZjMwMTc2MTg3NTA2YzA3Y2ExZmU5MDcxMDYyMWE5YWE2OWRlNGMyNmM4YTcyMWNiNzQmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.NqJ6NYMmTdo9S2M3X6eRIUKSvSNHOBT_J0moYZZi_8s)
+
 **lazy.nvim** is a modern plugin manager for Neovim.
 
 ![image](https://user-images.githubusercontent.com/292349/208301737-68fb279c-ba70-43ef-a369-8c3e8367d6b1.png)
